@@ -5,7 +5,7 @@ const {
     obtenerUsuarios,
     obtenerUsuarioPorId,
     crearUsuario
-} = require("../controllers/usuarios.controller");
+} = require("../controllers/usuario.controller");
 
 router.get("/", obtenerUsuarios);
 
