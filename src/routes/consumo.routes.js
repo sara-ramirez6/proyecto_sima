@@ -1,16 +1,17 @@
 const express = require("express");
+
 const router = express.Router();
- 
+
 const {
-    obtenerConsumos,
-    obtenerConsumoPorId,
-    crearConsumo
+    getAll,
+    getById,
+    create
 } = require("../controllers/consumo.controller");
- 
-router.get("/", obtenerConsumos);
- 
-router.get("/:id", obtenerConsumoPorId);
- 
-router.post("/", crearConsumo);
- 
+
+router.get("/", getAll);
+
+router.get("/:id", getById);
+
+router.post("/", create);
+
 module.exports = router;

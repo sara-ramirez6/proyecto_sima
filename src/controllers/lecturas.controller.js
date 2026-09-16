@@ -1,90 +1,88 @@
-const lecturas = require("../models/lectura.model");
- 
+const lecturaModel = require("../models/lectura.model");
+
 // GET /lecturas
+const getAll = async (req, res) => {
+    try {
+        const lecturas = await lecturaModel.getAll();
 
-const obtenerLecturas = (req, res) => {
+        res.json({
+            ok: true,
+            data: lecturas
+        });
+    } catch (error) {
+        console.error(error);
 
-    res.json(lecturas);
-
+        res.status(500).json({
+            ok: false,
+            msg: "Error al obtener las lecturas"
+        });
+    }
 };
- 
+
 // GET /lecturas/:id
+const getById = async (req, res) => {
+    try {
+        const lectura = await lecturaModel.getById(req.params.id);
 
-const obtenerLecturaPorId = (req, res) => {
+        if (!lectura) {
+            return res.status(404).json({
+                ok: false,
+                msg: "Lectura no encontrada"
+            });
+        }
 
-    const id = Number(req.params.id);
- 
-    const lectura = lecturas.find(lectura => lectura.id === id);
- 
-    if (!lectura) {
-
-        return res.status(404).json({
-
-            mensaje: "Lectura no encontrada"
-
+        res.json({
+            ok: true,
+            data: lectura
         });
+    } catch (error) {
+        console.error(error);
 
+        res.status(500).json({
+            ok: false,
+            msg: "Error al obtener la lectura"
+        });
     }
- 
-    res.json(lectura);
-
 };
- 
+
 // POST /lecturas
+const create = async (req, res) => {
+    try {
+        const {
+            id_medidor,
+            fecha,
+            consumo_litros
+        } = req.body;
 
-const crearLectura = (req, res) => {
+        if (!id_medidor || !fecha || consumo_litros === undefined) {
+            return res.status(400).json({
+                ok: false,
+                msg: "Todos los campos son obligatorios"
+            });
+        }
 
-    const {
+        const nuevaLectura = await lecturaModel.create(
+            id_medidor,
+            fecha,
+            consumo_litros
+        );
 
-        id_medidor,
-
-        fecha,
-
-        consumo_litros
-
-    } = req.body;
- 
-    if (!id_medidor || !fecha || consumo_litros === undefined) {
-
-        return res.status(400).json({
-
-            mensaje: "Todos los campos son obligatorios"
-
+        res.status(201).json({
+            ok: true,
+            data: nuevaLectura
         });
+    } catch (error) {
+        console.error(error);
 
+        res.status(500).json({
+            ok: false,
+            msg: "Error al crear la lectura"
+        });
     }
- 
-    const nuevaLectura = {
-
-        id: lecturas.length + 1,
-
-        id_medidor,
-
-        fecha,
-
-        consumo_litros
-
-    };
- 
-    lecturas.push(nuevaLectura);
- 
-    res.status(201).json({
-
-        mensaje: "Lectura creada correctamente",
-
-        lectura: nuevaLectura
-
-    });
-
 };
- 
+
 module.exports = {
-
-    obtenerLecturas,
-
-    obtenerLecturaPorId,
-
-    crearLectura
-
+    getAll,
+    getById,
+    create
 };
- 
