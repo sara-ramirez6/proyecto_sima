@@ -1,30 +1,40 @@
-let lecturas = [
+const pool = require('../../config/db');
 
-    {
+const getAll = async () => {
+  const [rows] = await pool.query(
+    'SELECT * FROM lecturas ORDER BY id DESC'
+  );
 
-        id: 1,
+  return rows;
+};
 
-        id_medidor: 1,
+const getById = async (id) => {
+  const [rows] = await pool.query(
+    'SELECT * FROM lecturas WHERE id = ?',
+    [id]
+  );
 
-        fecha: "2026-09-07",
+  return rows[0];
+};
 
-        consumo_litros: 120
+const create = async (id_medidor, fecha, consumo_litros) => {
+  const [result] = await pool.query(
+    `INSERT INTO lecturas
+    (id_medidor, fecha, consumo_litros)
+    VALUES (?, ?, ?)`,
+    [id_medidor, fecha, consumo_litros]
+  );
 
-    },
+  return {
+    id: result.insertId,
+    id_medidor,
+    fecha,
+    consumo_litros
+  };
+};
 
-    {
-
-        id: 2,
-
-        id_medidor: 2,
-
-        fecha: "2026-09-07",
-
-        consumo_litros: 95
-
-    }
-
-];
- 
-module.exports = lecturas;
- 
+module.exports = {
+  getAll,
+  getById,
+  create
+};

@@ -1,16 +1,17 @@
 const express = require("express");
+
 const router = express.Router();
- 
+
 const {
-    obtenerLecturas,
-    obtenerLecturaPorId,
-    crearLectura
+    getAll,
+    getById,
+    create
 } = require("../controllers/lecturas.controller");
- 
-router.get("/", obtenerLecturas);
- 
-router.get("/:id", obtenerLecturaPorId);
- 
-router.post("/", crearLectura);
- 
+
+router.get("/", getAll);
+
+router.get("/:id", getById);
+
+router.post("/", create);
+
 module.exports = router;

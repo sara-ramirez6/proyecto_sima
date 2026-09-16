@@ -1,48 +1,52 @@
-const conexion = require("../config/db");
+const consumoModel = require("../models/consumo.model");
 
 // GET /consumo
-const obtenerConsumos = async (req, res) => {
+const getAll = async (req, res) => {
     try {
-        const [consumos] = await conexion.query(
-            "SELECT * FROM consumo"
-        );
+        const consumos = await consumoModel.getAll();
 
-        res.json(consumos);
+        res.json({
+            ok: true,
+            data: consumos
+        });
     } catch (error) {
+        console.error(error);
+
         res.status(500).json({
-            mensaje: "Error al obtener consumos",
-            error: error.message
+            ok: false,
+            msg: "Error al obtener los consumos"
         });
     }
 };
 
 // GET /consumo/:id
-const obtenerConsumoPorId = async (req, res) => {
+const getById = async (req, res) => {
     try {
-        const id = Number(req.params.id);
+        const consumo = await consumoModel.getById(req.params.id);
 
-        const [consumos] = await conexion.query(
-            "SELECT * FROM consumo WHERE id = ?",
-            [id]
-        );
-
-        if (consumos.length === 0) {
+        if (!consumo) {
             return res.status(404).json({
-                mensaje: "Consumo no encontrado"
+                ok: false,
+                msg: "Consumo no encontrado"
             });
         }
 
-        res.json(consumos[0]);
+        res.json({
+            ok: true,
+            data: consumo
+        });
     } catch (error) {
+        console.error(error);
+
         res.status(500).json({
-            mensaje: "Error al obtener consumo",
-            error: error.message
+            ok: false,
+            msg: "Error al obtener el consumo"
         });
     }
 };
 
 // POST /consumo
-const crearConsumo = async (req, res) => {
+const create = async (req, res) => {
     try {
         const {
             id_medidor,
@@ -52,31 +56,33 @@ const crearConsumo = async (req, res) => {
 
         if (!id_medidor || !fecha || litros === undefined) {
             return res.status(400).json({
-                mensaje: "Todos los campos son obligatorios"
+                ok: false,
+                msg: "Todos los campos son obligatorios"
             });
         }
 
-        const [resultado] = await conexion.query(
-            `INSERT INTO consumo
-            (id_medidor, fecha, litros)
-            VALUES (?, ?, ?)`,
-            [id_medidor, fecha, litros]
+        const nuevoConsumo = await consumoModel.create(
+            id_medidor,
+            fecha,
+            litros
         );
 
         res.status(201).json({
-            mensaje: "Consumo registrado correctamente",
-            id: resultado.insertId
+            ok: true,
+            data: nuevoConsumo
         });
     } catch (error) {
+        console.error(error);
+
         res.status(500).json({
-            mensaje: "Error al registrar consumo",
-            error: error.message
+            ok: false,
+            msg: "Error al crear el consumo"
         });
     }
 };
 
 module.exports = {
-    obtenerConsumos,
-    obtenerConsumoPorId,
-    crearConsumo
+    getAll,
+    getById,
+    create
 };

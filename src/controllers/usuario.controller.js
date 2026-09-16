@@ -1,89 +1,85 @@
-const conexion = require("../config/db");
+const usuarioModel = require("../models/usuario.model");
 
 // GET /usuarios
-const obtenerUsuarios = async (req, res) => {
+const getAll = async (req, res) => {
     try {
-        const [usuarios] = await conexion.query(
-            "SELECT * FROM usuarios"
-        );
+        const usuarios = await usuarioModel.getAll();
 
-        res.json(usuarios);
+        res.json({
+            ok: true,
+            data: usuarios
+        });
     } catch (error) {
+        console.error(error);
+
         res.status(500).json({
-            mensaje: "Error al obtener usuarios",
-            error: error.message
+            ok: false,
+            msg: "Error al obtener los usuarios"
         });
     }
 };
 
 // GET /usuarios/:id
-const obtenerUsuarioPorId = async (req, res) => {
+const getById = async (req, res) => {
     try {
-        const id = Number(req.params.id);
+        const usuario = await usuarioModel.getById(req.params.id);
 
-        const [usuarios] = await conexion.query(
-            "SELECT * FROM usuarios WHERE id = ?",
-            [id]
-        );
-
-        if (usuarios.length === 0) {
+        if (!usuario) {
             return res.status(404).json({
-                mensaje: "Usuario no encontrado"
+                ok: false,
+                msg: "No encontrado"
             });
         }
 
-        res.json(usuarios[0]);
+        res.json({
+            ok: true,
+            data: usuario
+        });
     } catch (error) {
+        console.error(error);
+
         res.status(500).json({
-            mensaje: "Error al obtener usuario",
-            error: error.message
+            ok: false,
+            msg: "Error al obtener el usuario"
         });
     }
 };
 
 // POST /usuarios
-const crearUsuario = async (req, res) => {
+const create = async (req, res) => {
     try {
-        const {
+        const { nombre, cedula, correo, contrasena } = req.body;
+
+        if (!nombre || !cedula || !correo || !contrasena) {
+            return res.status(400).json({
+                ok: false,
+                msg: "Todos los campos son obligatorios"
+            });
+        }
+
+        const nuevoUsuario = await usuarioModel.create(
             nombre,
             cedula,
             correo,
             contrasena
-        } = req.body;
-
-        if (!nombre || !cedula || !correo || !contrasena) {
-            return res.status(400).json({
-                mensaje: "Todos los campos son obligatorios"
-            });
-        }
-
-        const [resultado] = await conexion.query(
-            `INSERT INTO usuarios
-            (nombre, cedula, correo, contrasena)
-            VALUES (?, ?, ?, ?)`,
-            [nombre, cedula, correo, contrasena]
         );
 
         res.status(201).json({
-            mensaje: "Usuario creado correctamente",
-            id: resultado.insertId,
-            usuario: {
-                nombre,
-                cedula,
-                correo,
-                contrasena
-            }
+            ok: true,
+            data: nuevoUsuario
         });
     } catch (error) {
+        console.error(error);
+
         res.status(500).json({
-            mensaje: "Error al crear usuario",
-            error: error.message
+            ok: false,
+            msg: "Error al crear el usuario"
         });
     }
 };
 
 module.exports = {
-    obtenerUsuarios,
-    obtenerUsuarioPorId,
-    crearUsuario
+    getAll,
+    getById,
+    create
 };

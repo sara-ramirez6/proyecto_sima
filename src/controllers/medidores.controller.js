@@ -1,48 +1,52 @@
-const conexion = require("../config/db");
+const medidorModel = require("../models/medidor.model");
 
 // GET /medidores
-const obtenerMedidores = async (req, res) => {
+const getAll = async (req, res) => {
     try {
-        const [medidores] = await conexion.query(
-            "SELECT * FROM medidores"
-        );
+        const medidores = await medidorModel.getAll();
 
-        res.json(medidores);
+        res.json({
+            ok: true,
+            data: medidores
+        });
     } catch (error) {
+        console.error(error);
+
         res.status(500).json({
-            mensaje: "Error al obtener medidores",
-            error: error.message
+            ok: false,
+            msg: "Error al obtener los medidores"
         });
     }
 };
 
 // GET /medidores/:id
-const obtenerMedidorPorId = async (req, res) => {
+const getById = async (req, res) => {
     try {
-        const id = Number(req.params.id);
+        const medidor = await medidorModel.getById(req.params.id);
 
-        const [medidores] = await conexion.query(
-            "SELECT * FROM medidores WHERE id = ?",
-            [id]
-        );
-
-        if (medidores.length === 0) {
+        if (!medidor) {
             return res.status(404).json({
-                mensaje: "Medidor no encontrado"
+                ok: false,
+                msg: "Medidor no encontrado"
             });
         }
 
-        res.json(medidores[0]);
+        res.json({
+            ok: true,
+            data: medidor
+        });
     } catch (error) {
+        console.error(error);
+
         res.status(500).json({
-            mensaje: "Error al obtener medidor",
-            error: error.message
+            ok: false,
+            msg: "Error al obtener el medidor"
         });
     }
 };
 
 // POST /medidores
-const crearMedidor = async (req, res) => {
+const create = async (req, res) => {
     try {
         const {
             id_usuario,
@@ -53,31 +57,34 @@ const crearMedidor = async (req, res) => {
 
         if (!id_usuario || !numero_serie || !ubicacion || !estado) {
             return res.status(400).json({
-                mensaje: "Todos los campos son obligatorios"
+                ok: false,
+                msg: "Todos los campos son obligatorios"
             });
         }
 
-        const [resultado] = await conexion.query(
-            `INSERT INTO medidores
-            (id_usuario, numero_serie, ubicacion, estado)
-            VALUES (?, ?, ?, ?)`,
-            [id_usuario, numero_serie, ubicacion, estado]
+        const nuevoMedidor = await medidorModel.create(
+            id_usuario,
+            numero_serie,
+            ubicacion,
+            estado
         );
 
         res.status(201).json({
-            mensaje: "Medidor creado correctamente",
-            id: resultado.insertId
+            ok: true,
+            data: nuevoMedidor
         });
     } catch (error) {
+        console.error(error);
+
         res.status(500).json({
-            mensaje: "Error al crear medidor",
-            error: error.message
+            ok: false,
+            msg: "Error al crear el medidor"
         });
     }
 };
 
 module.exports = {
-    obtenerMedidores,
-    obtenerMedidorPorId,
-    crearMedidor
+    getAll,
+    getById,
+    create
 };

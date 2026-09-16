@@ -1,22 +1,17 @@
 const express = require("express");
 
 const router = express.Router();
- 
+
 const {
-
-    obtenerAlertas,
-
-    obtenerAlertaPorId,
-
-    crearAlerta
-
+    getAll,
+    getById,
+    create
 } = require("../controllers/alertas.controller");
- 
-router.get("/", obtenerAlertas);
- 
-router.get("/:id", obtenerAlertaPorId);
- 
-router.post("/", crearAlerta);
- 
+
+router.get("/", getAll);
+
+router.get("/:id", getById);
+
+router.post("/", create);
+
 module.exports = router;
- 

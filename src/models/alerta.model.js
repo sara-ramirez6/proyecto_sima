@@ -1,18 +1,41 @@
-let alertas = [
-    {
-        id: 1,
-        id_medidor: 1,
-        tipo: "Consumo alto",
-        mensaje: "Se detectó un consumo superior al promedio",
-        estado: "activa"
-    },
-    {
-        id: 2,
-        id_medidor: 2,
-        tipo: "Posible fuga",
-        mensaje: "Se detectó un consumo continuo",
-        estado: "activa"
-    }
-];
- 
-module.exports = alertas;
+const pool = require('../../config/db');
+
+const getAll = async () => {
+  const [rows] = await pool.query(
+    'SELECT * FROM alertas ORDER BY id DESC'
+  );
+
+  return rows;
+};
+
+const getById = async (id) => {
+  const [rows] = await pool.query(
+    'SELECT * FROM alertas WHERE id = ?',
+    [id]
+  );
+
+  return rows[0];
+};
+
+const create = async (id_medidor, tipo, mensaje, estado) => {
+  const [result] = await pool.query(
+    `INSERT INTO alertas
+    (id_medidor, tipo, mensaje, estado)
+    VALUES (?, ?, ?, ?)`,
+    [id_medidor, tipo, mensaje, estado]
+  );
+
+  return {
+    id: result.insertId,
+    id_medidor,
+    tipo,
+    mensaje,
+    estado
+  };
+};
+
+module.exports = {
+  getAll,
+  getById,
+  create
+};

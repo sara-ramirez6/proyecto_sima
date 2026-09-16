@@ -1,22 +1,17 @@
 const express = require("express");
 
 const router = express.Router();
- 
+
 const {
-
-    obtenerMedidores,
-
-    obtenerMedidorPorId,
-
-    crearMedidor
-
+    getAll,
+    getById,
+    create
 } = require("../controllers/medidores.controller");
- 
-router.get("/", obtenerMedidores);
- 
-router.get("/:id", obtenerMedidorPorId);
- 
-router.post("/", crearMedidor);
- 
+
+router.get("/", getAll);
+
+router.get("/:id", getById);
+
+router.post("/", create);
+
 module.exports = router;
- 

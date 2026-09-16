@@ -1,48 +1,52 @@
-const conexion = require("../config/db");
+const alertaModel = require("../models/alerta.model");
 
 // GET /alertas
-const obtenerAlertas = async (req, res) => {
+const getAll = async (req, res) => {
     try {
-        const [alertas] = await conexion.query(
-            "SELECT * FROM alertas"
-        );
+        const alertas = await alertaModel.getAll();
 
-        res.json(alertas);
+        res.json({
+            ok: true,
+            data: alertas
+        });
     } catch (error) {
+        console.error(error);
+
         res.status(500).json({
-            mensaje: "Error al obtener alertas",
-            error: error.message
+            ok: false,
+            msg: "Error al obtener las alertas"
         });
     }
 };
 
 // GET /alertas/:id
-const obtenerAlertaPorId = async (req, res) => {
+const getById = async (req, res) => {
     try {
-        const id = Number(req.params.id);
+        const alerta = await alertaModel.getById(req.params.id);
 
-        const [alertas] = await conexion.query(
-            "SELECT * FROM alertas WHERE id = ?",
-            [id]
-        );
-
-        if (alertas.length === 0) {
+        if (!alerta) {
             return res.status(404).json({
-                mensaje: "Alerta no encontrada"
+                ok: false,
+                msg: "Alerta no encontrada"
             });
         }
 
-        res.json(alertas[0]);
+        res.json({
+            ok: true,
+            data: alerta
+        });
     } catch (error) {
+        console.error(error);
+
         res.status(500).json({
-            mensaje: "Error al obtener alerta",
-            error: error.message
+            ok: false,
+            msg: "Error al obtener la alerta"
         });
     }
 };
 
 // POST /alertas
-const crearAlerta = async (req, res) => {
+const create = async (req, res) => {
     try {
         const {
             id_medidor,
@@ -53,31 +57,34 @@ const crearAlerta = async (req, res) => {
 
         if (!id_medidor || !tipo || !mensaje || !estado) {
             return res.status(400).json({
-                mensaje: "Todos los campos son obligatorios"
+                ok: false,
+                msg: "Todos los campos son obligatorios"
             });
         }
 
-        const [resultado] = await conexion.query(
-            `INSERT INTO alertas
-            (id_medidor, tipo, mensaje, estado)
-            VALUES (?, ?, ?, ?)`,
-            [id_medidor, tipo, mensaje, estado]
+        const nuevaAlerta = await alertaModel.create(
+            id_medidor,
+            tipo,
+            mensaje,
+            estado
         );
 
         res.status(201).json({
-            mensaje: "Alerta creada correctamente",
-            id: resultado.insertId
+            ok: true,
+            data: nuevaAlerta
         });
     } catch (error) {
+        console.error(error);
+
         res.status(500).json({
-            mensaje: "Error al crear alerta",
-            error: error.message
+            ok: false,
+            msg: "Error al crear la alerta"
         });
     }
 };
 
 module.exports = {
-    obtenerAlertas,
-    obtenerAlertaPorId,
-    crearAlerta
+    getAll,
+    getById,
+    create
 };
