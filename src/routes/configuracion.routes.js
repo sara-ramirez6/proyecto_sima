@@ -8,7 +8,7 @@ const {
   create,
   update,
   remove
-} = require("../controllers/usuario.controller");
+} = require("../controllers/configuracion.controller");
 
 router.get("/", getAll);
 

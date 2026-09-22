@@ -8,7 +8,7 @@ const {
   create,
   update,
   remove
-} = require("../controllers/usuario.controller");
+} = require("../controllers/reporte.controller");
 
 router.get("/", getAll);
 

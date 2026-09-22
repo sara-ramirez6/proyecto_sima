@@ -1,8 +1,8 @@
-const Usuario = require("../models/usuario.model");
+const Configuracion = require("../models/configuracion.model");
 
 const getAll = async (req, res) => {
   try {
-    const data = await Usuario.getAll();
+    const data = await Configuracion.getAll();
 
     res.json({
       ok: true,
@@ -18,12 +18,12 @@ const getAll = async (req, res) => {
 
 const getById = async (req, res) => {
   try {
-    const data = await Usuario.getById(req.params.id);
+    const data = await Configuracion.getById(req.params.id);
 
     if (!data) {
       return res.status(404).json({
         ok: false,
-        error: "Usuario no encontrado"
+        error: "Configuración no encontrada"
       });
     }
 
@@ -41,13 +41,18 @@ const getById = async (req, res) => {
 
 const create = async (req, res) => {
   try {
-    const { nombre, cedula, correo, contrasena } = req.body;
+    const {
+      usuario_id,
+      notificaciones,
+      modo_oscuro,
+      unidad_medida
+    } = req.body;
 
-    const data = await Usuario.create(
-      nombre,
-      cedula,
-      correo,
-      contrasena
+    const data = await Configuracion.create(
+      usuario_id,
+      notificaciones ?? true,
+      modo_oscuro ?? false,
+      unidad_medida ?? "m3"
     );
 
     res.status(201).json({
@@ -64,26 +69,31 @@ const create = async (req, res) => {
 
 const update = async (req, res) => {
   try {
-    const { nombre, cedula, correo, contrasena } = req.body;
+    const {
+      usuario_id,
+      notificaciones,
+      modo_oscuro,
+      unidad_medida
+    } = req.body;
 
-    const affectedRows = await Usuario.update(
+    const affectedRows = await Configuracion.update(
       req.params.id,
-      nombre,
-      cedula,
-      correo,
-      contrasena
+      usuario_id,
+      notificaciones,
+      modo_oscuro,
+      unidad_medida
     );
 
     if (affectedRows === 0) {
       return res.status(404).json({
         ok: false,
-        error: "Usuario no encontrado"
+        error: "Configuración no encontrada"
       });
     }
 
     res.json({
       ok: true,
-      message: "Usuario actualizado correctamente"
+      message: "Configuración actualizada correctamente"
     });
   } catch (error) {
     res.status(500).json({
@@ -95,18 +105,18 @@ const update = async (req, res) => {
 
 const remove = async (req, res) => {
   try {
-    const affectedRows = await Usuario.remove(req.params.id);
+    const affectedRows = await Configuracion.remove(req.params.id);
 
     if (affectedRows === 0) {
       return res.status(404).json({
         ok: false,
-        error: "Usuario no encontrado"
+        error: "Configuración no encontrada"
       });
     }
 
     res.json({
       ok: true,
-      message: "Usuario eliminado correctamente"
+      message: "Configuración eliminada correctamente"
     });
   } catch (error) {
     res.status(500).json({
