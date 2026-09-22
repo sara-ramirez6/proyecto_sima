@@ -1,8 +1,8 @@
-const Usuario = require("../models/usuario.model");
+const Reporte = require("../models/reporte.model");
 
 const getAll = async (req, res) => {
   try {
-    const data = await Usuario.getAll();
+    const data = await Reporte.getAll();
 
     res.json({
       ok: true,
@@ -18,12 +18,12 @@ const getAll = async (req, res) => {
 
 const getById = async (req, res) => {
   try {
-    const data = await Usuario.getById(req.params.id);
+    const data = await Reporte.getById(req.params.id);
 
     if (!data) {
       return res.status(404).json({
         ok: false,
-        error: "Usuario no encontrado"
+        error: "Reporte no encontrado"
       });
     }
 
@@ -41,13 +41,18 @@ const getById = async (req, res) => {
 
 const create = async (req, res) => {
   try {
-    const { nombre, cedula, correo, contrasena } = req.body;
+    const {
+      usuario_id,
+      titulo,
+      descripcion,
+      tipo
+    } = req.body;
 
-    const data = await Usuario.create(
-      nombre,
-      cedula,
-      correo,
-      contrasena
+    const data = await Reporte.create(
+      usuario_id,
+      titulo,
+      descripcion,
+      tipo
     );
 
     res.status(201).json({
@@ -64,26 +69,31 @@ const create = async (req, res) => {
 
 const update = async (req, res) => {
   try {
-    const { nombre, cedula, correo, contrasena } = req.body;
+    const {
+      usuario_id,
+      titulo,
+      descripcion,
+      tipo
+    } = req.body;
 
-    const affectedRows = await Usuario.update(
+    const affectedRows = await Reporte.update(
       req.params.id,
-      nombre,
-      cedula,
-      correo,
-      contrasena
+      usuario_id,
+      titulo,
+      descripcion,
+      tipo
     );
 
     if (affectedRows === 0) {
       return res.status(404).json({
         ok: false,
-        error: "Usuario no encontrado"
+        error: "Reporte no encontrado"
       });
     }
 
     res.json({
       ok: true,
-      message: "Usuario actualizado correctamente"
+      message: "Reporte actualizado correctamente"
     });
   } catch (error) {
     res.status(500).json({
@@ -95,18 +105,18 @@ const update = async (req, res) => {
 
 const remove = async (req, res) => {
   try {
-    const affectedRows = await Usuario.remove(req.params.id);
+    const affectedRows = await Reporte.remove(req.params.id);
 
     if (affectedRows === 0) {
       return res.status(404).json({
         ok: false,
-        error: "Usuario no encontrado"
+        error: "Reporte no encontrado"
       });
     }
 
     res.json({
       ok: true,
-      message: "Usuario eliminado correctamente"
+      message: "Reporte eliminado correctamente"
     });
   } catch (error) {
     res.status(500).json({

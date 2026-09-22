@@ -1,8 +1,8 @@
-const Usuario = require("../models/usuario.model");
+const Notificacion = require("../models/notificacion.model");
 
 const getAll = async (req, res) => {
   try {
-    const data = await Usuario.getAll();
+    const data = await Notificacion.getAll();
 
     res.json({
       ok: true,
@@ -18,12 +18,12 @@ const getAll = async (req, res) => {
 
 const getById = async (req, res) => {
   try {
-    const data = await Usuario.getById(req.params.id);
+    const data = await Notificacion.getById(req.params.id);
 
     if (!data) {
       return res.status(404).json({
         ok: false,
-        error: "Usuario no encontrado"
+        error: "Notificación no encontrada"
       });
     }
 
@@ -41,13 +41,20 @@ const getById = async (req, res) => {
 
 const create = async (req, res) => {
   try {
-    const { nombre, cedula, correo, contrasena } = req.body;
+    const {
+      usuario_id,
+      titulo,
+      mensaje,
+      tipo,
+      leida
+    } = req.body;
 
-    const data = await Usuario.create(
-      nombre,
-      cedula,
-      correo,
-      contrasena
+    const data = await Notificacion.create(
+      usuario_id,
+      titulo,
+      mensaje,
+      tipo,
+      leida ?? false
     );
 
     res.status(201).json({
@@ -64,26 +71,33 @@ const create = async (req, res) => {
 
 const update = async (req, res) => {
   try {
-    const { nombre, cedula, correo, contrasena } = req.body;
+    const {
+      usuario_id,
+      titulo,
+      mensaje,
+      tipo,
+      leida
+    } = req.body;
 
-    const affectedRows = await Usuario.update(
+    const affectedRows = await Notificacion.update(
       req.params.id,
-      nombre,
-      cedula,
-      correo,
-      contrasena
+      usuario_id,
+      titulo,
+      mensaje,
+      tipo,
+      leida
     );
 
     if (affectedRows === 0) {
       return res.status(404).json({
         ok: false,
-        error: "Usuario no encontrado"
+        error: "Notificación no encontrada"
       });
     }
 
     res.json({
       ok: true,
-      message: "Usuario actualizado correctamente"
+      message: "Notificación actualizada correctamente"
     });
   } catch (error) {
     res.status(500).json({
@@ -95,18 +109,18 @@ const update = async (req, res) => {
 
 const remove = async (req, res) => {
   try {
-    const affectedRows = await Usuario.remove(req.params.id);
+    const affectedRows = await Notificacion.remove(req.params.id);
 
     if (affectedRows === 0) {
       return res.status(404).json({
         ok: false,
-        error: "Usuario no encontrado"
+        error: "Notificación no encontrada"
       });
     }
 
     res.json({
       ok: true,
-      message: "Usuario eliminado correctamente"
+      message: "Notificación eliminada correctamente"
     });
   } catch (error) {
     res.status(500).json({
