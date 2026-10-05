@@ -8,9 +8,11 @@ const {
     create
 } = require("../controllers/usuario.controller");
 
-router.get("/", getAll);
+const { verificarToken } = require("../middleware/authMiddleware");
 
-router.get("/:id", getById);
+router.get("/", verificarToken, getAll);
+
+router.get("/:id", verificarToken, getById);
 
 router.post("/", create);
 
