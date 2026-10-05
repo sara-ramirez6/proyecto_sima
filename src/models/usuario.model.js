@@ -35,6 +35,17 @@ const create = async (nombre, cedula, correo, contrasena) => {
   };
 };
 
+const login = async (correo) => {
+  const [rows] = await pool.query(
+    `SELECT id, nombre, cedula, correo, contrasena
+     FROM usuarios
+     WHERE correo = ?`,
+    [correo]
+  );
+
+  return rows[0];
+};
+
 const update = async (id, nombre, cedula, correo, contrasena) => {
   const [result] = await pool.query(
     `UPDATE usuarios
@@ -59,6 +70,7 @@ module.exports = {
   getAll,
   getById,
   create,
+  login,
   update,
   remove
 };
