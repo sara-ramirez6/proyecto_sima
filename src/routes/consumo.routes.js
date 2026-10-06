@@ -8,6 +8,10 @@ const {
     create
 } = require("../controllers/consumo.controller");
 
+const { verificarToken } = require("../middleware/authMiddleware");
+
+router.use(verificarToken);
+
 router.get("/", getAll);
 
 router.get("/:id", getById);

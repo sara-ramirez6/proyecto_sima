@@ -3,6 +3,7 @@ const express = require("express");
 const app = express();
 
 const usuarioRoutes = require("./routes/usuario.routes");
+const authRoutes = require("./routes/auth.routes");
 const medidoresRoutes = require("./routes/medidores.routes");
 const lecturasRoutes = require("./routes/lecturas.routes");
 const consumoRoutes = require("./routes/consumo.routes");
@@ -16,6 +17,7 @@ const configuracionRoutes = require("./routes/configuracion.routes");
 app.use(express.json());
 
 app.use("/usuarios", usuarioRoutes);
+app.use("/auth", authRoutes);
 app.use("/medidores", medidoresRoutes);
 app.use("/lecturas", lecturasRoutes);
 app.use("/consumo", consumoRoutes);
