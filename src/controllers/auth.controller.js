@@ -2,6 +2,56 @@
 const jwt = require("jsonwebtoken");
 const usuarioModel = require("../models/usuario.model");
 
+// POST /auth/register
+const register = async (req, res) => {
+    try {
+        const { nombre, cedula, correo, contrasena } = req.body;
+
+        if (!nombre || !cedula || !correo || !contrasena) {
+            return res.status(400).json({
+                ok: false,
+                msg: "Nombre, cédula, correo y contraseña son obligatorios"
+            });
+        }
+
+        // Verificar si el correo ya está registrado
+        const usuarioExistente = await usuarioModel.login(correo);
+
+        if (usuarioExistente) {
+            return res.status(409).json({
+                ok: false,
+                msg: "El correo ya está registrado"
+            });
+        }
+
+        // Crear el usuario
+        const nuevoUsuario = await usuarioModel.create(
+            nombre,
+            cedula,
+            correo,
+            contrasena
+        );
+
+        return res.status(201).json({
+            ok: true,
+            msg: "Usuario registrado exitosamente",
+            usuario: {
+                id: nuevoUsuario.id,
+                nombre: nuevoUsuario.nombre,
+                correo: nuevoUsuario.correo
+            }
+        });
+
+    } catch (error) {
+        console.error(error);
+
+        return res.status(500).json({
+            ok: false,
+            msg: "Error al registrar el usuario"
+        });
+    }
+};
+
 // POST /auth/login
 const login = async (req, res) => {
     try {
@@ -35,7 +85,7 @@ const login = async (req, res) => {
             }
         );
 
-        res.json({
+        return res.json({
             ok: true,
             msg: "Inicio de sesión exitoso",
             token,
@@ -49,7 +99,7 @@ const login = async (req, res) => {
     } catch (error) {
         console.error(error);
 
-        res.status(500).json({
+        return res.status(500).json({
             ok: false,
             msg: "Error al iniciar sesión"
         });
@@ -57,6 +107,7 @@ const login = async (req, res) => {
 };
 
 module.exports = {
-    login
+    login,
+    register
 };
 
