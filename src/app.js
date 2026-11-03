@@ -1,5 +1,5 @@
 const express = require("express");
-
+const cors = require('cors');
 const app = express();
 
 const usuarioRoutes = require("./routes/usuario.routes");
@@ -15,6 +15,10 @@ const configuracionRoutes = require("./routes/configuracion.routes");
 
 
 app.use(express.json());
+app.use(cors({
+    origin: ['http://localhost:5173', 'http://127.0.0.1:5173'],
+    allowedHeaders: ['Content-Type', 'Authorization'],
+}));
 
 app.use("/usuarios", usuarioRoutes);
 app.use("/auth", authRoutes);
