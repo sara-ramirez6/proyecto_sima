@@ -1,9 +1,9 @@
+
 const medidorModel = require("../models/medidor.model");
 
-// GET /medidores
 const getAll = async (req, res) => {
     try {
-        const medidores = await medidorModel.getAll();
+        const medidores = await medidorModel.getAll(req.usuario.id);
 
         res.json({
             ok: true,
@@ -19,10 +19,12 @@ const getAll = async (req, res) => {
     }
 };
 
-// GET /medidores/:id
 const getById = async (req, res) => {
     try {
-        const medidor = await medidorModel.getById(req.params.id);
+        const medidor = await medidorModel.getById(
+            req.params.id,
+            req.usuario.id
+        );
 
         if (!medidor) {
             return res.status(404).json({
@@ -45,17 +47,11 @@ const getById = async (req, res) => {
     }
 };
 
-// POST /medidores
 const create = async (req, res) => {
     try {
-        const {
-            id_usuario,
-            numero_serie,
-            ubicacion,
-            estado
-        } = req.body;
+        const { numero_serie, ubicacion, estado } = req.body;
 
-        if (!id_usuario || !numero_serie || !ubicacion || !estado) {
+        if (!numero_serie || !ubicacion || !estado) {
             return res.status(400).json({
                 ok: false,
                 msg: "Todos los campos son obligatorios"
@@ -63,7 +59,7 @@ const create = async (req, res) => {
         }
 
         const nuevoMedidor = await medidorModel.create(
-            id_usuario,
+            req.usuario.id,
             numero_serie,
             ubicacion,
             estado

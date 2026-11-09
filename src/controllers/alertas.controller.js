@@ -1,9 +1,9 @@
-const alertaModel = require("../models/alerta.model");
 
-// GET /alertas
+const alertaModel = require('../models/alerta.model');
+
 const getAll = async (req, res) => {
     try {
-        const alertas = await alertaModel.getAll();
+        const alertas = await alertaModel.getAll(req.usuario.id);
 
         res.json({
             ok: true,
@@ -14,20 +14,22 @@ const getAll = async (req, res) => {
 
         res.status(500).json({
             ok: false,
-            msg: "Error al obtener las alertas"
+            msg: 'Error al obtener las alertas'
         });
     }
 };
 
-// GET /alertas/:id
 const getById = async (req, res) => {
     try {
-        const alerta = await alertaModel.getById(req.params.id);
+        const alerta = await alertaModel.getById(
+            req.params.id,
+            req.usuario.id
+        );
 
         if (!alerta) {
             return res.status(404).json({
                 ok: false,
-                msg: "Alerta no encontrada"
+                msg: 'Alerta no encontrada'
             });
         }
 
@@ -40,25 +42,19 @@ const getById = async (req, res) => {
 
         res.status(500).json({
             ok: false,
-            msg: "Error al obtener la alerta"
+            msg: 'Error al obtener la alerta'
         });
     }
 };
 
-// POST /alertas
 const create = async (req, res) => {
     try {
-        const {
-            id_medidor,
-            tipo,
-            mensaje,
-            estado
-        } = req.body;
+        const { id_medidor, tipo, mensaje, estado } = req.body;
 
         if (!id_medidor || !tipo || !mensaje || !estado) {
             return res.status(400).json({
                 ok: false,
-                msg: "Todos los campos son obligatorios"
+                msg: 'Todos los campos son obligatorios'
             });
         }
 
@@ -66,8 +62,16 @@ const create = async (req, res) => {
             id_medidor,
             tipo,
             mensaje,
-            estado
+            estado,
+            req.usuario.id
         );
+
+        if (!nuevaAlerta) {
+            return res.status(403).json({
+                ok: false,
+                msg: 'No puedes registrar alertas para este medidor'
+            });
+        }
 
         res.status(201).json({
             ok: true,
@@ -78,7 +82,7 @@ const create = async (req, res) => {
 
         res.status(500).json({
             ok: false,
-            msg: "Error al crear la alerta"
+            msg: 'Error al crear la alerta'
         });
     }
 };

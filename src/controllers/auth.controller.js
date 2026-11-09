@@ -1,5 +1,5 @@
-
 const jwt = require("jsonwebtoken");
+const bcrypt = require("bcrypt");
 const usuarioModel = require("../models/usuario.model");
 
 // POST /auth/register
@@ -10,11 +10,10 @@ const register = async (req, res) => {
         if (!nombre || !cedula || !correo || !contrasena) {
             return res.status(400).json({
                 ok: false,
-                msg: "Nombre, cédula, correo y contraseña son obligatorios"
+                msg: "Todos los campos son obligatorios"
             });
         }
 
-        // Verificar si el correo ya está registrado
         const usuarioExistente = await usuarioModel.login(correo);
 
         if (usuarioExistente) {
@@ -24,12 +23,13 @@ const register = async (req, res) => {
             });
         }
 
-        // Crear el usuario
+        const contrasenaHash = await bcrypt.hash(contrasena, 10);
+
         const nuevoUsuario = await usuarioModel.create(
             nombre,
             cedula,
             correo,
-            contrasena
+            contrasenaHash
         );
 
         return res.status(201).json({
@@ -66,7 +66,7 @@ const login = async (req, res) => {
 
         const usuario = await usuarioModel.login(correo);
 
-        if (!usuario || usuario.contrasena !== contrasena) {
+        if (!usuario || !(await bcrypt.compare(contrasena, usuario.contrasena))) {
             return res.status(401).json({
                 ok: false,
                 msg: "Credenciales inválidas"
@@ -110,4 +110,3 @@ module.exports = {
     login,
     register
 };
-

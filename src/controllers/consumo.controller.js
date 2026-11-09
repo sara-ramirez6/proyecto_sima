@@ -1,9 +1,8 @@
 const consumoModel = require("../models/consumo.model");
 
-// GET /consumo
 const getAll = async (req, res) => {
     try {
-        const consumos = await consumoModel.getAll();
+        const consumos = await consumoModel.getAll(req.usuario.id);
 
         res.json({
             ok: true,
@@ -19,10 +18,12 @@ const getAll = async (req, res) => {
     }
 };
 
-// GET /consumo/:id
 const getById = async (req, res) => {
     try {
-        const consumo = await consumoModel.getById(req.params.id);
+        const consumo = await consumoModel.getById(
+            req.params.id,
+            req.usuario.id
+        );
 
         if (!consumo) {
             return res.status(404).json({
@@ -45,14 +46,9 @@ const getById = async (req, res) => {
     }
 };
 
-// POST /consumo
 const create = async (req, res) => {
     try {
-        const {
-            id_medidor,
-            fecha,
-            litros
-        } = req.body;
+        const { id_medidor, fecha, litros } = req.body;
 
         if (!id_medidor || !fecha || litros === undefined) {
             return res.status(400).json({
@@ -64,8 +60,16 @@ const create = async (req, res) => {
         const nuevoConsumo = await consumoModel.create(
             id_medidor,
             fecha,
-            litros
+            litros,
+            req.usuario.id
         );
+
+        if (!nuevoConsumo) {
+            return res.status(403).json({
+                ok: false,
+                msg: "El medidor no pertenece a este usuario"
+            });
+        }
 
         res.status(201).json({
             ok: true,

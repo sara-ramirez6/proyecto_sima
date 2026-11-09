@@ -1,8 +1,9 @@
+
 const Notificacion = require("../models/notificacion.model");
 
 const getAll = async (req, res) => {
   try {
-    const data = await Notificacion.getAll();
+    const data = await Notificacion.getAll(req.usuario.id);
 
     res.json({
       ok: true,
@@ -18,7 +19,10 @@ const getAll = async (req, res) => {
 
 const getById = async (req, res) => {
   try {
-    const data = await Notificacion.getById(req.params.id);
+    const data = await Notificacion.getById(
+      req.params.id,
+      req.usuario.id
+    );
 
     if (!data) {
       return res.status(404).json({
@@ -41,16 +45,17 @@ const getById = async (req, res) => {
 
 const create = async (req, res) => {
   try {
-    const {
-      usuario_id,
-      titulo,
-      mensaje,
-      tipo,
-      leida
-    } = req.body;
+    const { titulo, mensaje, tipo, leida } = req.body;
+
+    if (!titulo || !mensaje || !tipo) {
+      return res.status(400).json({
+        ok: false,
+        error: "Todos los campos son obligatorios"
+      });
+    }
 
     const data = await Notificacion.create(
-      usuario_id,
+      req.usuario.id,
       titulo,
       mensaje,
       tipo,
@@ -71,17 +76,18 @@ const create = async (req, res) => {
 
 const update = async (req, res) => {
   try {
-    const {
-      usuario_id,
-      titulo,
-      mensaje,
-      tipo,
-      leida
-    } = req.body;
+    const { titulo, mensaje, tipo, leida } = req.body;
+
+    if (!titulo || !mensaje || !tipo || leida === undefined) {
+      return res.status(400).json({
+        ok: false,
+        error: "Todos los campos son obligatorios"
+      });
+    }
 
     const affectedRows = await Notificacion.update(
       req.params.id,
-      usuario_id,
+      req.usuario.id,
       titulo,
       mensaje,
       tipo,
@@ -109,7 +115,10 @@ const update = async (req, res) => {
 
 const remove = async (req, res) => {
   try {
-    const affectedRows = await Notificacion.remove(req.params.id);
+    const affectedRows = await Notificacion.remove(
+      req.params.id,
+      req.usuario.id
+    );
 
     if (affectedRows === 0) {
       return res.status(404).json({

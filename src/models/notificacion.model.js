@@ -1,21 +1,24 @@
-const pool = require('../../config/db');
 
-const getAll = async () => {
+const pool = require("../../config/db");
+
+const getAll = async (usuario_id) => {
   const [rows] = await pool.query(
     `SELECT id, usuario_id, titulo, mensaje, tipo, leida, fecha
      FROM notificaciones
-     ORDER BY id DESC`
+     WHERE usuario_id = ?
+     ORDER BY id DESC`,
+    [usuario_id]
   );
 
   return rows;
 };
 
-const getById = async (id) => {
+const getById = async (id, usuario_id) => {
   const [rows] = await pool.query(
     `SELECT id, usuario_id, titulo, mensaje, tipo, leida, fecha
      FROM notificaciones
-     WHERE id = ?`,
-    [id]
+     WHERE id = ? AND usuario_id = ?`,
+    [id, usuario_id]
   );
 
   return rows[0];
@@ -42,19 +45,19 @@ const create = async (usuario_id, titulo, mensaje, tipo, leida) => {
 const update = async (id, usuario_id, titulo, mensaje, tipo, leida) => {
   const [result] = await pool.query(
     `UPDATE notificaciones
-     SET usuario_id = ?, titulo = ?, mensaje = ?, tipo = ?, leida = ?
-     WHERE id = ?`,
-    [usuario_id, titulo, mensaje, tipo, leida, id]
+     SET titulo = ?, mensaje = ?, tipo = ?, leida = ?
+     WHERE id = ? AND usuario_id = ?`,
+    [titulo, mensaje, tipo, leida, id, usuario_id]
   );
 
   return result.affectedRows;
 };
 
-const remove = async (id) => {
+const remove = async (id, usuario_id) => {
   const [result] = await pool.query(
     `DELETE FROM notificaciones
-     WHERE id = ?`,
-    [id]
+     WHERE id = ? AND usuario_id = ?`,
+    [id, usuario_id]
   );
 
   return result.affectedRows;
