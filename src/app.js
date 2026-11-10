@@ -1,6 +1,8 @@
 const express = require("express");
 
 const app = express();
+const cors = require("cors");
+"el cors es un middleware que permite controlar el acceso a recursos desde diferentes dominios. En este caso, se está configurando para permitir solicitudes desde 'http://localhost:5173' y 'http://localhost:5173', y se especifica que se permiten los encabezados 'Content-Type' y 'Authorization'. Esto es útil para habilitar la comunicación entre el frontend y el backend de la aplicación, especialmente cuando están alojados en diferentes dominios o puertos."
 
 const usuarioRoutes = require("./routes/usuario.routes");
 const authRoutes = require("./routes/auth.routes");
@@ -13,6 +15,10 @@ const facturacionRoutes = require("./routes/facturacion.routes");
 const notificacionRoutes = require("./routes/notificacion.routes");
 const configuracionRoutes = require("./routes/configuracion.routes");
 
+app.use(cors({
+    origin: ['http://localhost:5173', 'http://localhost:5173'],
+    allowedHeaders: ['Content-Type', 'Authorization'],
+}));
 
 app.use(express.json());
 

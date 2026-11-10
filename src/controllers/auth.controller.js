@@ -1,5 +1,5 @@
-
 const jwt = require("jsonwebtoken");
+const bcrypt = require("bcrypt");
 const usuarioModel = require("../models/usuario.model");
 
 // POST /auth/register
@@ -14,7 +14,6 @@ const register = async (req, res) => {
             });
         }
 
-        // Verificar si el correo ya está registrado
         const usuarioExistente = await usuarioModel.login(correo);
 
         if (usuarioExistente) {
@@ -24,12 +23,13 @@ const register = async (req, res) => {
             });
         }
 
-        // Crear el usuario
+        const contrasenaHash = await bcrypt.hash(contrasena, 10);
+
         const nuevoUsuario = await usuarioModel.create(
             nombre,
             cedula,
             correo,
-            contrasena
+            contrasenaHash
         );
 
         return res.status(201).json({
@@ -66,7 +66,19 @@ const login = async (req, res) => {
 
         const usuario = await usuarioModel.login(correo);
 
-        if (!usuario || usuario.contrasena !== contrasena) {
+        if (!usuario) {
+            return res.status(401).json({
+                ok: false,
+                msg: "Credenciales inválidas"
+            });
+        }
+
+        const contrasenaCorrecta = await bcrypt.compare(
+            contrasena,
+            usuario.contrasena
+        );
+
+        if (!contrasenaCorrecta) {
             return res.status(401).json({
                 ok: false,
                 msg: "Credenciales inválidas"
@@ -110,4 +122,3 @@ module.exports = {
     login,
     register
 };
-
