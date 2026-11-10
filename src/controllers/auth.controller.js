@@ -1,3 +1,4 @@
+
 const jwt = require("jsonwebtoken");
 const bcrypt = require("bcrypt");
 const usuarioModel = require("../models/usuario.model");
@@ -66,7 +67,19 @@ const login = async (req, res) => {
 
         const usuario = await usuarioModel.login(correo);
 
-        if (!usuario || !(await bcrypt.compare(contrasena, usuario.contrasena))) {
+        if (!usuario) {
+            return res.status(401).json({
+                ok: false,
+                msg: "Credenciales inválidas"
+            });
+        }
+
+        const contrasenaCorrecta = await bcrypt.compare(
+            contrasena,
+            usuario.contrasena
+        );
+
+        if (!contrasenaCorrecta) {
             return res.status(401).json({
                 ok: false,
                 msg: "Credenciales inválidas"
